@@ -1364,7 +1364,18 @@ function ldOnceIn() {
   
   
   
-  if (document.body.classList.contains('home')) return () => {};
+  
+  
+  
+  if (document.body.classList.contains('home')) {
+    const hs = ['#name', '.hero .htitle', '#cue', '#isocap'].map(q => document.querySelector(q)).filter(Boolean);
+    hs.forEach(e => { e.dataset.ent = '1'; e.style.transition = 'none'; e.style.opacity = '0'; e.style.transform = 'translateY(48px)'; });
+    return () => hs.forEach((e, k) => {
+      void e.offsetWidth;
+      e.style.transition = `opacity .7s ease ${k * 0.07}s, transform 1.1s ${LD_RISE} ${k * 0.07}s`; e.style.opacity = ''; e.style.transform = '';
+      setTimeout(() => { e.style.transition = ''; delete e.dataset.ent; }, 1150 + k * 70);
+    });
+  }
   const els = [document.querySelector('main')].filter(Boolean);
   const far = innerWidth > 540 ? '50vh' : '10vh';   
   els.forEach(e => { e.style.transition = 'none'; e.style.transform = `translateY(${far})`; });

@@ -95,14 +95,14 @@
 <div class="pv" aria-hidden="true"><canvas></canvas></div><button class="mbtn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="mpanel" data-mag-d="60"><i></i></button>
 <nav class="mpanel" id="mpanel" aria-label="Menu"><a href="./">Home</a><a href="work/">Work</a><a href="about">About</a><a href="contact">Contact</a><a href="cv/Mohamed_Ellithy_CV_Data_Analyst.pdf">CV</a><a href="ar/" lang="ar" hreflang="ar">عربي</a></nav>
 <script>(() => { const b = document.querySelector(".mbtn"), p = document.getElementById("mpanel"), top = document.querySelector(".top-wrap"), HOME = true; b.addEventListener("pointerenter", e => { if (e.pointerType !== "mouse") return; b.classList.remove("leave"); void b.offsetWidth; b.classList.add("hov"); }); b.addEventListener("pointerleave", () => { if (!b.classList.contains("hov")) return; b.classList.remove("hov"); b.classList.add("leave"); setTimeout(() => b.classList.remove("leave"), 650); }); const opens = [b, ...document.querySelectorAll(".nv-menu")]; const show = () => b.classList.toggle("on", (HOME && top.getBoundingClientRect().bottom < 0) || p.classList.contains("open")); const set = o => { p.classList.toggle("open", o); opens.forEach(x => x.setAttribute("aria-expanded", o)); show(); if (o) { const a = p.querySelector("a"); if (a) setTimeout(() => a.focus({ preventScroll: true }), 60); } }; addEventListener("scroll", show, { passive: true }); show(); opens.forEach(x => x.addEventListener("click", () => set(!p.classList.contains("open")))); addEventListener("keydown", e => { if (e.key === "Escape" && p.classList.contains("open")) { set(false); b.focus({ preventScroll: true }); } }); const cue = document.getElementById("cue"), cs = () => { if (cue) cue.classList.toggle("gone", scrollY > 24); }; addEventListener("scroll", cs, { passive: true }); cs(); })();</script>
-<script src="assets/kit.js?v=1793878774" defer data-early="1" data-hello="1"></script>
+<script src="assets/kit.js?v=1793880988" defer data-early="1" data-hello="1"></script>
 <script src="assets/cards.js?v=1793846224" defer></script>
 <script src="assets/sama-steps.js?v=1793846224" defer></script>
 <script src="assets/scene-sama.js?v=1793868417" defer></script>
 <script src="assets/scene-xml.js?v=1793868946" defer></script>
 <script src="assets/g4-cells.js?v=1793861240" defer></script>
 <script src="assets/scenes-r.js?v=1793846224" defer></script>
-<script src="assets/isohome.js?v=1793879897" defer></script>
+<script src="assets/isohome.js?v=1793880988" defer></script>
 <script>addEventListener("DOMContentLoaded",function(){KIT.magnets();KIT.circleMagnets();KIT.smoothWheel();KIT.nextScene();var R=document.getElementById('rows');KIT.homeRows(R);if(matchMedia('(hover: hover) and (pointer: fine)').matches)KIT.workList(R);});</script>
 </body>
 </html>
