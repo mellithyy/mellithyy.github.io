@@ -1219,6 +1219,7 @@ function polyPart(pts, u) {
   return out;
 }
 function drawDecor(d, t, litMix, dim, bo) {
+  if (DECOR_MODE !== 'all') { const moving = !!(d.fn || d.draw || d.flow || d.dots); if ((DECOR_MODE === 'still') === moving) return; }
   if (d.face >= 0 && !d.s.front[d.face]) return;
   if (d.s.hidden) return;
   const u = STILL ? 1 : clamp((t - d.t0) / 0.5, 0, 1);
@@ -1250,14 +1251,16 @@ const X0 = (x, y) => (x - y) * Math.SQRT1_2;
 
 
 const RAIL = 0.1;
+let PIPE_MODE = 'all', DECOR_MODE = 'all';   
 function drawPipe(r, t, dim) {
   const u = STILL ? 1 : clamp((t - r.t0) / (r.t1 - r.t0), 0, 1);
   if (u <= 0) return;
   
-  if ((r.pl || 0) > 0.05 && !STILL && u >= 1) {
+  if (PIPE_MODE !== 'rails' && (r.pl || 0) > 0.05 && !STILL && u >= 1) {
     ctx.save(); ctx.setLineDash([2.5, 7]); ctx.lineDashOffset = -t * 26; ctx.strokeStyle = rgb(ACC, 0.85 * r.pl); ctx.lineWidth = 1.3;
     ctx.beginPath(); r.p.forEach((q, i) => { const X = pjx(q[0], q[1], 0), Y = pjy(q[0], q[1], 0); i ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); }); ctx.stroke(); ctx.restore();
   }
+  if (PIPE_MODE === 'flow') return;
   const q = easeOut(u), sEnd = r.L * q, P = r.p, cum = r.cum, pl = r.pl || 0;
   ctx.strokeStyle = rgb(mixc(ink(0.3 * (1 - 0.45 * dim * (1 - pl))), ACC, 0.7 * pl)); ctx.lineWidth = 1;
   for (const side of [-1, 1]) {
@@ -1403,6 +1406,7 @@ function drawShadows(t) {
 const ancestors = id => { const out = new Set(), st = [id]; while (st.length) { const c = st.pop(); for (const u of (UPS[c] || [])) if (!out.has(u)) { out.add(u); st.push(u); } } return out; };
 
 let FRAMES = 0, lastF = null, frameAct = null;
+let STILLPIC = null;
 function frame(t) {
   if (!M) return;
   FRAMES++;
@@ -1434,27 +1438,27 @@ function frame(t) {
   const boost = arrivalBoost(t);
 
   
-  drawShadows(t);
-  for (const r of M.pipes.slice().sort((a, b) => (a.pl || 0) - (b.pl || 0))) drawPipe(r, t, dimAmt);   
+  
+  
+  
+  
+  M.pk = packets(t); let warn = 0; for (const k of M.pk) { const q = at(k.rt, k.s); k.x = q[0]; k.y = q[1]; if (k.stop != null) warn = Math.max(warn, k.a * (1 - smooth((k.stop - 0.9) / 0.8))); }
+  for (const p of M.parts) { for (const s of p.prims) project(s, t); p.depthC = p.prims.reduce((a, s) => a + s.depth, 0) / p.prims.length; }
+  const order = M.parts.slice().sort((a, b) => a.depthC - b.depthC);
   const litP = M.parts.find(p => p.lit > 0.01);
-  if (litP) {   
+  const pool = () => {   
+    if (!litP) return;
     const b = litP.bb || [0, 0, 0, 0], cx = (b[0] + b[2]) / 2, rr = Math.max(40, (b[2] - b[0]) * 0.75);
     const fy = pjy(...(litP.upAs || [litP.anchor])[0].slice(0, 2), 0);
     ctx.save(); ctx.translate(cx, fy); ctx.scale(1, Math.sin(el * Math.PI / 180));
     const g = ctx.createRadialGradient(0, 0, 0, 0, 0, rr); g.addColorStop(0, rgb(ACC, 0.11 * litP.lit)); g.addColorStop(1, rgb(ACC, 0));
     ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, rr, 0, Math.PI * 2); ctx.fill(); ctx.restore();
-  }
-  M.pk = packets(t); let warn = 0; for (const k of M.pk) { const q = at(k.rt, k.s); k.x = q[0]; k.y = q[1]; if (k.stop != null) warn = Math.max(warn, k.a * (1 - smooth((k.stop - 0.9) / 0.8))); }
-  drawPackets(M.pk, dimAmt);
-
-  
-  for (const p of M.parts) { for (const s of p.prims) project(s, t); p.depthC = p.prims.reduce((a, s) => a + s.depth, 0) / p.prims.length; }
-  const order = M.parts.slice().sort((a, b) => a.depthC - b.depthC);
-  for (const p of order) {
-    const lit = p.lit, pl = p.pl || 0, on = Math.max(lit, pl), dim = dimAmt * (1 - on), bo = (boost[p.id] || 0) * (1 - lit);
+  };
+  const drawPart = (p, bo, wn) => {   
+    const lit = p.lit, pl = p.pl || 0, on = Math.max(lit, pl), dim = dimAmt * (1 - on);
     const eTone = lerp(0.84, 0.4, dim) + 0.14 * bo;
     
-    const amb = Math.max(lit, 0.72 * pl, p.id === 'check' ? 0.42 * warn * (1 - lit) : 0);
+    const amb = Math.max(lit, 0.72 * pl, p.id === 'check' ? 0.42 * wn * (1 - lit) : 0);
     const col = rgb(mixc(ink(eTone), ACC, amb)), colIn = rgb(mixc(ink(eTone * 0.8), ACC, amb));
     const fillA = STILL ? 1 : smooth((t - p.t0 - 0.1) / 0.5);
     
@@ -1462,14 +1466,49 @@ function frame(t) {
     if (lit > 0.01) ctx.shadowColor = rgb(ACC, 0.55 * lit);
     for (const s of prims) {
       if (s.hidden) continue;
-      ctx.shadowBlur = 0; fillSolid(s, fillA, Math.max(lit, 0.45 * pl));
-      if (lit > 0.01) ctx.shadowBlur = 9 * lit * DPR;
-      strokeSolid(s, t, col, colIn);
-      ctx.shadowBlur = 0;
+      if (DECOR_MODE !== 'moving') {
+        ctx.shadowBlur = 0; fillSolid(s, fillA, Math.max(lit, 0.45 * pl));
+        if (lit > 0.01) ctx.shadowBlur = 9 * lit * DPR;
+        strokeSolid(s, t, col, colIn);
+        ctx.shadowBlur = 0;
+      }
       for (const d of p.decor) if (d.s === s) drawDecor(d, t, Math.max(lit, 0.72 * pl), dim, bo);
     }
-
     ctx.shadowBlur = 0;
+  };
+  const pipesSorted = M.pipes.slice().sort((a, b) => (a.pl || 0) - (b.pl || 0));   
+  const steady = !SEEKING && !STILL && t > T_DRAW + 1 && !orbit.drag && !orbit.a && !orbit.e && dimAmt === dTarget
+    && M.parts.every(p => p.lit === p._tl && (p.pl || 0) === p._tp) && M.pipes.every(r => (r.pl || 0) === r._tp);
+  if (steady) {
+    const key = [canvas.width, canvas.height, DPR, S, OX, OY, AZ0, EL0, act || '', BOTH ? 1 : 0, dimAmt,
+      M.parts.map(p => p.lit + ',' + (p.pl || 0) + ',' + (p.prims.some(s => s.hidden) ? 1 : 0)).join(';')].join('|');
+    if (!STILLPIC || STILLPIC.key !== key) {
+      const mk = () => { const c = document.createElement('canvas'); c.width = canvas.width; c.height = canvas.height; return c; };
+      const under = mk(), over = mk();
+      drawShadows(t); PIPE_MODE = 'rails'; for (const r of pipesSorted) drawPipe(r, t, dimAmt); PIPE_MODE = 'all'; pool();
+      under.getContext('2d').drawImage(canvas, 0, 0); ctx.clearRect(0, 0, W, H);
+      DECOR_MODE = 'still'; for (const p of order) drawPart(p, 0, 0); DECOR_MODE = 'all';
+      over.getContext('2d').drawImage(canvas, 0, 0); ctx.clearRect(0, 0, W, H);
+      STILLPIC = { key, under, over };
+    }
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(STILLPIC.under, 0, 0); ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    PIPE_MODE = 'flow'; for (const r of pipesSorted) drawPipe(r, t, dimAmt); PIPE_MODE = 'all';
+    drawPackets(M.pk, dimAmt);
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(STILLPIC.over, 0, 0); ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    for (const p of order) {
+      const bo = (boost[p.id] || 0) * (1 - p.lit), wn = p.id === 'check' ? warn : 0;
+      if (bo > 0.004 || 0.42 * wn * (1 - p.lit) > 0.004) drawPart(p, bo, wn);   
+      else { DECOR_MODE = 'moving'; drawPart(p, 0, 0); DECOR_MODE = 'all'; }
+    }
+  } else {
+    STILLPIC = null;
+    
+    drawShadows(t);
+    for (const r of pipesSorted) drawPipe(r, t, dimAmt);
+    pool();
+    drawPackets(M.pk, dimAmt);
+    
+    for (const p of order) drawPart(p, (boost[p.id] || 0) * (1 - p.lit), warn);
   }
 
   
