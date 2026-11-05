@@ -1,0 +1,20 @@
+Copyright (c) 2026 Mohamed Ellithy. All rights reserved.
+
+This repository holds the published copy of the portfolio website of Mohamed Ellithy (its pages, code, drawings, animations,
+texts, images, one-page PDFs and CV).
+
+No license is granted. You may view the website in a web browser at https://mellithyy.github.io/ and you may link to it.
+
+You may not copy, reproduce, modify, re-host, redistribute, sell or otherwise use any part of the website, its code, its design,
+its drawings, its texts or its images, in whole or in part, including to train or evaluate machine-learning or AI models, without
+the author's prior written permission.
+
+Parts that belong to others keep their own terms:
+- Fonts: Beiruti and Mona Sans are used under the SIL Open Font License 1.1 (the licence files are in assets/fonts); Switzer is
+  used under the Indian Type Foundry Free Font License (Fontshare). They belong to their makers.
+- Data: the Saudi card spending figures are computed by the author from the Saudi Central Bank (SAMA) Open Data Portal
+  (https://www.sama.gov.sa/en-US/Statistics/); SAMA's data remain subject to SAMA's own terms of use, and SAMA is not responsible
+  for this analysis. The heart risk figures come from the US CDC's Behavioral Risk Factor Surveillance System (public data).
+  Charts marked "illustrative data" do not show real figures.
+
+Contact: https://mellithyy.github.io/contact
