@@ -2227,7 +2227,7 @@ html:not(.fnt) .ldc .ldt, html:not(.fnt) .ldc .ldw::before { visibility: hidden;
 :root[dir="rtl"] .dn .rbtn .crc-arr svg { transform: rotate(180deg); }
 .pjhead.wide .pj-live .mag-in { max-width: none; }
 
-.dn .rbtn .crc-arr svg, .ft2.dn2 .ft2-go .ft2-arr svg, .pjhead.wide .pj-live svg, .dn .rbtn .crc-arr svg path, .ft2.dn2 .ft2-go .ft2-arr svg path, .pjhead.wide .pj-live svg path { stroke-width: 2.4; }
+.dn .rbtn .crc-arr svg, .ft2.dn2 .ft2-go .ft2-arr svg, .pjhead.wide .pj-live svg, .dn .rbtn .crc-arr svg path, .ft2.dn2 .ft2-go .ft2-arr svg path, .pjhead.wide .pj-live svg path { stroke-width: 1.6; }
 
 
 .nx .xtbl { margin-top: clamp(56px, 6vw, 88px); }
