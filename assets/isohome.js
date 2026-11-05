@@ -1647,7 +1647,14 @@ const endDrag = e => {
 };
 document.addEventListener('pointerup', endDrag); document.addEventListener('pointercancel', endDrag);
 
-document.addEventListener('pointerdown', e => { if (!M || !pinId || orbit.drag) return; const [x, y] = local(e); if (onUi(e) || x < 0 || y < 0 || x > W || y > H || !pick(x, y)) { pinId = null; pinBoth = false; wake(); } }, { passive: true });
+
+
+
+const unpinAt = e => { if (!M || !pinId || orbit.drag) return; if (cardEl && cardEl.contains(e.target)) return; const [x, y] = local(e); if (onUi(e) || x < 0 || y < 0 || x > W || y > H || !pick(x, y)) { pinId = null; pinBoth = false; wake(); } };
+let tapAt = null;
+document.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse') unpinAt(e); else tapAt = { x: e.clientX, y: e.clientY, t: performance.now() }; }, { passive: true });
+document.addEventListener('pointerup', e => { if (e.pointerType === 'mouse' || !tapAt) return; const still = Math.hypot(e.clientX - tapAt.x, e.clientY - tapAt.y) < 10 && performance.now() - tapAt.t < 600; tapAt = null; if (still) unpinAt(e); }, { passive: true });
+document.addEventListener('pointercancel', () => { tapAt = null; }, { passive: true });
 addEventListener('keydown', e => { if (e.key === 'Escape' && (pinId || focusId || hoverId)) { pinId = null; pinBoth = false; hoverId = null; if (document.activeElement && keysEl.contains(document.activeElement)) document.activeElement.blur(); focusId = null; wake(); } });
 document.addEventListener('mouseout', e => { if (!e.relatedTarget && hoverId) { hoverId = null; wake(); } });
 
