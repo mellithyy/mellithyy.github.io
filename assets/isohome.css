@@ -169,3 +169,6 @@ html.seek .iso-note, html.seek .iso-note span { transition: none; }
 html.isodrag, html.isodrag * { -webkit-user-select: none !important; user-select: none !important; }
 
 .lab.iso-lab { opacity: 0; }
+
+
+@media (min-width: 1101px) { #isoscene { will-change: transform, opacity; } }

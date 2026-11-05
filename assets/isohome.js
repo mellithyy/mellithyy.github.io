@@ -1664,10 +1664,10 @@ function springs(dt) {
 function tick() {
   const tn = now(), dt = Math.min(0.05, tn - last); last = tn;
   const moving = springs(dt);
-  const t = STILL ? T_DRAW + 0.5 : tn - t0;
+  const t = STILL ? T_DRAW + 0.5 : (away ? awayT : tn - t0);
   const settling = M && (M.parts.some(p => p.lit !== (p._tl || 0) || (p.pl || 0) !== (p._tp || 0)) || M.pipes.some(r => (r.pl || 0) !== (r._tp || 0)) || dimAmt !== (activeId() || (chainAt(t) || {}).on ? 1 : 0) || activeId() !== frameAct);
   const live = STILL && !PIC && !CH.cancel && CH.rm0 && chainClock(t) < CH.end + HOLD + 1;
-  const need = visible && (!STILL || moving || settling || orbit.drag || live);
+  const need = visible && ((!STILL && !away) || moving || settling || orbit.drag || live);
   if (need) frame(t);
   if (need) requestAnimationFrame(tick); else running = false;
 }
@@ -1678,6 +1678,16 @@ const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => {
   visible = v; if (v) wake();
 }) : null;
 if (io && !SEEKING) io.observe(boxEl);
+
+
+
+let away = false, awayT = 0;
+addEventListener('scroll', () => {
+  const a = !SEEKING && !STILL && innerWidth > 1100 && scrollY > 4;
+  if (a === away) return;
+  if (a) { awayT = now() - t0; away = true; }
+  else { away = false; t0 = now() - awayT; wake(); }
+}, { passive: true });
 const seekT = () => STILL ? T_DRAW + 0.5 : (parseFloat(Q.get('t')) || 0);
 window.__seek = sec => { frame(sec); return new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); };
 window.__hulls = () => { frameHulls(); const r = canvas.getBoundingClientRect(); return M.parts.map(p => [p.id, (p.hull || []).map(q => [Math.round(q[0] + r.left), Math.round(q[1] + r.top)])]); };
