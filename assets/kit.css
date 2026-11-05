@@ -2598,3 +2598,14 @@ html.js .deck .deck-r:not(.on) { display: none; }
 
 
 @media (max-width: 760px) { .allw .soonrow .soonb { display: table; margin: 10px 0 0; } }
+
+
+@media (max-width: 760px) {
+  .top .who.lgo { padding-inline: 0; }
+  .top nav .nv-menu { padding-inline-end: 0; }
+}
+@media (hover: none) {
+  .ft2.dn2 .ft2-mailcap .ft2-copy:hover, .ft2.dn2 .ft2-mailcap .ft2-copy:focus-visible, .ft2-copy:hover, .ctd-copy:hover { background: #121110; color: #eee9e0; border-color: rgba(238,233,224,.25); }
+  .ft2.dn2 .ft2-mailcap:has(.ft2-copy:hover)::before { transform: translate3d(0, 76%, 0); }
+}
+.ft-copy.done, .ft-copy.done:hover, .ft2.dn2 .ft2-mailcap .ft2-copy.done, .ft2.dn2 .ft2-mailcap .ft2-copy.done:hover { background: #d9a441 !important; border-color: #d9a441 !important; color: #121110 !important; }

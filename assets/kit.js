@@ -2117,11 +2117,21 @@ function contact() {
   const num = [66, 45, 45, 38, 45, 31, 17, 10, 52, 10, 52, 66].map(x => (x - 3) / 7).join('');
   document.querySelectorAll('[data-wa]').forEach(a => { a.href = 'https://wa.me/' + num; a.target = '_blank'; a.rel = 'noopener'; });
   document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => {
-    const note = b.parentElement.querySelector('.ft-note'), txt = b.dataset.copy;
+    const txt = b.dataset.copy;
     let ok = false;
     try { await navigator.clipboard.writeText(txt); ok = true; } catch (e) {
       try { const t = document.createElement('textarea'); t.value = txt; t.setAttribute('readonly', ''); t.style.position = 'fixed'; t.style.opacity = '0'; document.body.appendChild(t); t.select(); ok = document.execCommand('copy'); t.remove(); } catch (e2) {}
     }
+    
+    
+    if (ok) {
+      if (!b._icon) b._icon = b.innerHTML;
+      b.innerHTML = '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
+      b.classList.add('done'); clearTimeout(b._d);
+      b._d = setTimeout(() => { b.classList.remove('done'); b.innerHTML = b._icon; }, 1600);
+    }
+    if (matchMedia('(hover: none)').matches) b.blur();
+    let note = null; for (let n = b.parentElement; n && !note; n = n.parentElement) note = n.querySelector('.ft-note');
     if (!note) return;
     note.textContent = ok ? b.dataset.done : txt; note.classList.add('on');
     clearTimeout(b._t); b._t = setTimeout(() => note.classList.remove('on'), ok ? 2400 : 8000);
