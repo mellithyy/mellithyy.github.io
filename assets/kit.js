@@ -2119,6 +2119,7 @@ function contact() {
 
 
 
+
 function logoHead() {
   const Ls = [...document.querySelectorAll('.who.lgo')]; if (!Ls.length) return;
   const measure = L => { const xs = [...L.querySelectorAll('.lg-x')], y = L.querySelector('.lg-y');
@@ -2137,7 +2138,7 @@ function logoHead() {
     first = false;
     Ls.forEach(L => { L.style.visibility = 'hidden'; });
     window.__lgOpen = () => { if (window.__lgOpened) return; window.__lgOpened = true;
-      Ls.forEach(L => { L.style.visibility = ''; measure(L); setTimeout(() => L.classList.add('full'), 250); setTimeout(() => L.classList.remove('full'), 2000); }); };
+      Ls.forEach(L => { L.style.visibility = ''; measure(L); setTimeout(() => (innerWidth > 760 && L.classList.add('full')), 250); setTimeout(() => L.classList.remove('full'), 2000); }); };
     setTimeout(() => window.__lgOpen && window.__lgOpen(), 6000);   
   }
   Ls.forEach(L => {
@@ -2148,10 +2149,10 @@ function logoHead() {
       setTimeout(go, ME && ME.dataset.hello ? 2600 : 400);
     }
     if (matchMedia('(hover: hover) and (min-width: 541px)').matches) {
-      L.addEventListener('mouseenter', () => { measure(L); L.classList.add('full'); });
+      L.addEventListener('mouseenter', () => { measure(L); (innerWidth > 760 && L.classList.add('full')); });
       L.addEventListener('mouseleave', () => L.classList.remove('full'));
     }
-    L.addEventListener('focus', () => L.classList.add('full')); L.addEventListener('blur', () => L.classList.remove('full'));
+    L.addEventListener('focus', () => (innerWidth > 760 && L.classList.add('full'))); L.addEventListener('blur', () => L.classList.remove('full'));
   });
   if (document.fonts) document.fonts.ready.then(all);
   addEventListener('resize', all);
