@@ -1070,7 +1070,9 @@ function hello() {
   const el = document.createElement('div'); el.className = 'hello'; el.setAttribute('aria-hidden', 'true');
   document.body.appendChild(el);
   html.classList.remove('hello-on');
-  let outRes; const out = HELLO = new Promise(r => { outRes = r; });
+  let outRes0; const out = HELLO = new Promise(r => { outRes0 = r; });
+  const enter = document.body.classList.contains('home') && !RM ? homeEnter() : () => {};
+  const outRes = v => { enter(); outRes0(v); };
   const words = AR ? ['أهلاً', 'Hello'] : ['Hello', 'أهلاً'];
   const fontOf = (w, px) => /[a-z]/i.test(w) ? `800 ${px}px "Switzer", system-ui, sans-serif` : `800 ${px}px "Beiruti", "Segoe UI", Tahoma, sans-serif`;
   let done = false;
@@ -1360,6 +1362,19 @@ function ldBuild(label) {
   return ldc;
 }
 function ldHide() { if (!ldc) return; ldc.classList.remove('on'); ldc.querySelectorAll('*').forEach(e => e.removeAttribute('style')); ldc = null; }
+
+
+
+function homeEnter() {
+  const hs = ['#name', '.hero .htitle', '#cue', '#isocap'].map(q => document.querySelector(q)).filter(Boolean);
+  hs.forEach(e => { e.dataset.ent = '1'; e.style.transition = 'none'; e.style.opacity = '0'; e.style.transform = 'translateY(48px)'; });
+  let gone = false;
+  return () => { if (gone) return; gone = true; hs.forEach((e, k) => {
+    void e.offsetWidth;
+    e.style.transition = `opacity .7s ease ${k * 0.07}s, transform 1.1s ${LD_RISE} ${k * 0.07}s`; e.style.opacity = ''; e.style.transform = '';
+    setTimeout(() => { e.style.transition = ''; delete e.dataset.ent; }, 1150 + k * 70);
+  }); };
+}
 function ldOnceIn() {
   
   
@@ -1367,15 +1382,7 @@ function ldOnceIn() {
   
   
   
-  if (document.body.classList.contains('home')) {
-    const hs = ['#name', '.hero .htitle', '#cue', '#isocap'].map(q => document.querySelector(q)).filter(Boolean);
-    hs.forEach(e => { e.dataset.ent = '1'; e.style.transition = 'none'; e.style.opacity = '0'; e.style.transform = 'translateY(48px)'; });
-    return () => hs.forEach((e, k) => {
-      void e.offsetWidth;
-      e.style.transition = `opacity .7s ease ${k * 0.07}s, transform 1.1s ${LD_RISE} ${k * 0.07}s`; e.style.opacity = ''; e.style.transform = '';
-      setTimeout(() => { e.style.transition = ''; delete e.dataset.ent; }, 1150 + k * 70);
-    });
-  }
+  if (document.body.classList.contains('home')) return homeEnter();
   const els = [document.querySelector('main')].filter(Boolean);
   const far = innerWidth > 540 ? '50vh' : '10vh';   
   els.forEach(e => { e.style.transition = 'none'; e.style.transform = `translateY(${far})`; });

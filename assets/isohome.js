@@ -1715,7 +1715,7 @@ if (PIC) {
   const settled = () => { const mn = document.querySelector('main'), h = document.documentElement.classList;
     return !h.contains('tx-in') && !document.querySelector('.ldc.on') && !document.querySelector('[data-ent]') && !(mn && mn.style.transform); };
   const afterRise = fn => { const go = () => settled() ? fn() : setTimeout(go, 80); go(); };
-  Promise.all([fontsOr, Promise.race([helloOut, new Promise(r => setTimeout(r, 1200))])]).then(() => afterRise(() => { measure(); startLive(); }));
+  Promise.all([fontsOr, Promise.race([helloOut, new Promise(r => setTimeout(r, 4000))])]).then(() => afterRise(() => { measure(); startLive(); }));   
 }
 let rz = 0;
 addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { cardEl._qfix = false; CH.noRestCard = false; measure(); frame(PIC ? seekT() : STILL ? T_DRAW + 0.5 : (started ? now() - t0 : -1)); }, 140); });
