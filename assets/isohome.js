@@ -700,15 +700,20 @@ function measure() {
   solveLabels();
   
   
-  if (NARROW) for (let k = 0; k < 6; k++) {
-    setView(AZ0, EL0); let over = 0;
-    M.parts.forEach((p, i) => { const X = pjx(...p.anchor), w = labs[i]._w || 70, sd = p.side || 'r', l = sd === 'c' ? X - w / 2 : sd === 'l' ? X - 10 - w : X + 10; over = Math.max(over, l + w - (W - 6), 6 - l); });
-    if (over <= 0.5) break;
+  
+  
+  if (NARROW) { const PM = clamp(innerWidth * 0.032, 20, 64); for (let k = 0; k < 8; k++) {
+    setView(AZ0, EL0); let lo = OX + x0 * S, hi = OX + x1 * S;
+    M.parts.forEach((p, i) => { const X = pjx(...p.anchor), w = labs[i]._w || 70, sd = p.side || 'r', l = sd === 'c' ? X - w / 2 : sd === 'l' ? X - 10 - w : X + 10; lo = Math.min(lo, l); hi = Math.max(hi, l + w); });
+    if (lo >= PM - 0.5 && hi <= W - PM + 0.5) break;
+    const room = W - 2 * PM;
+    if (hi - lo <= room) { OX += PM + (room - (hi - lo)) / 2 - lo; solveLabels(); continue; }
+    const over = (hi - lo - room) / 2;
     const wAvail = W - 2 * m; S = S * Math.max(0.6, (wAvail - 2 * over - 4) / wAvail);
     H = Math.round((y1 - y0) * S + LAB + (COMPACT ? 54 : 22)); if (Math.abs(boxEl.clientHeight - H) > 1) boxEl.style.setProperty('--isoph', H + 'px');
     FR = [m, 0, W - m, H]; OX = m + (wAvail - (x1 - x0) * S) / 2 - x0 * S; OY = LAB - y0 * S;
     solveLabels();
-  }
+  } }
   canvas.width = Math.round(W * DPR); canvas.height = Math.round((NARROW ? H : boxEl.clientHeight) * DPR);
   H = canvas.height / DPR;
   layoutKeys();
@@ -723,13 +728,15 @@ function measure() {
 
 const LEADER = 30;
 let HDRB = 0;
-function solveLabels() {
+function solveLabels(first) {   
   { const tw = document.querySelector('.top-wrap'); HDRB = tw && !NARROW ? tw.getBoundingClientRect().bottom - boxEl.getBoundingClientRect().top : 0; }
   const hulls = M.parts.map(p => p.uHull.map(q => [OX + q[0] * S, OY + q[1] * S]));
-  const placed = [];
+  const placed = [], segs = [];   
   setView(AZ0, EL0);
   const rails = []; for (const r of M.pipes) for (let s = 0; s <= r.L; s += 0.12) { const q = at(r, s); rails.push([pjx(q[0], q[1], 0), pjy(q[0], q[1], 0)]); }
   const order = M.parts.map((p, i) => i).sort((a, b) => M.parts[a].uAs[0][1] - M.parts[b].uAs[0][1]);
+  if (first >= 0) { order.splice(order.indexOf(first), 1); order.unshift(first); }
+  let total = 0;
   let cxP = 0; { let lo = Infinity, hi = -Infinity; for (const P of hulls) for (const q of P) { lo = Math.min(lo, q[0]); hi = Math.max(hi, q[0]); } cxP = (lo + hi) / 2; }
   for (const i of order) {
     const p = M.parts[i], w = labs[i]._w || 60, h = labs[i]._h || 14;
@@ -767,14 +774,26 @@ function solveLabels() {
         if (nb[0] < 20 || nb[2] > W - 20) cost += 30;
       }
       for (const q of placed) cost += overlap(box, q) * (NARROW ? 30 : 0.5);   
+      
+      const seg = [ax - 3, Math.min(ay, top), ax + 3, Math.max(ay, top)];
+      if (NARROW) { for (const q of placed) if (overlap(seg, [q[0] - 2, q[1] - 2, q[2] + 2, q[3] + 2]) > 0) cost += 800; for (const g of segs) if (overlap(box, g) > 0) cost += 800; }
       for (const [rx, ry] of rails) if (hitRect(air, rx, ry)) cost += 30;   
       for (const r of OBST) cost += overlap(box, [r[0] - 36, r[1] - 16, r[2] + 36, r[3] + 16]) * 0.5;   
       if (box[1] < 2) cost += NARROW ? 5000 : 40;   
       if (!NARROW && box[1] < HDRB - 18) cost += 35;   
-      if (cost < bestCost) { bestCost = cost; best = { lead, box, ai, side, dir, nb }; }
+      if (cost < bestCost) { bestCost = cost; best = { lead, box, ai, side, dir, nb, seg }; }
     }
-    p.lead = best.lead; p.side = best.side; p.dir = best.dir; p.anchor = best.dir > 0 ? p.downA : p.upAs[best.ai]; placed.push(best.box); if (best.nb) placed.push(best.nb);
+    p.lead = best.lead; p.side = best.side; p.dir = best.dir; p.anchor = best.dir > 0 ? p.downA : p.upAs[best.ai]; placed.push(best.box); if (best.nb) placed.push(best.nb); segs.push(best.seg); p._lc = bestCost; total += bestCost;
   }
+  
+  
+  if (NARROW && first === undefined) {
+    let bestT = total, bestF = -1;
+    M.parts.map((p, i) => i).filter(i => M.parts[i]._lc >= 800).forEach(i => { const t = solveLabels(i); if (t < bestT - 0.5) { bestT = t; bestF = i; } });
+    if (M.parts.some(p => p._lc >= 800) || bestF >= 0) solveLabels(bestF);
+    return bestT;
+  }
+  return total;
 }
 
 

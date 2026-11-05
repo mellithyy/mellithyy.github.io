@@ -1096,6 +1096,20 @@ function hello() {
   const hdrLogo = [...document.querySelectorAll('.who.lgo')].find(e => e.getBoundingClientRect().width > 0) || document.querySelector('.who.lgo');
   let lgEl = null;
   if (hdrLogo) { lgEl = document.createElement('div'); lgEl.className = 'hello-logo who lgo'; lgEl.innerHTML = hdrLogo.innerHTML; el.appendChild(lgEl); }
+  
+  
+  const prp = lgEl && lgEl.querySelector('.lg-pr path');
+  if (prp && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const O = [2, 2.5, 8, 8, 2, 13.5], C = [1, 7.6, 5, 9.8, 9, 7.6], tS = performance.now() + 900;
+    const set = k => { const v = O.map((o, i) => +(o + (C[i] - o) * k).toFixed(3)); prp.setAttribute('d', 'M' + v[0] + ' ' + v[1] + ' L' + v[2] + ' ' + v[3] + ' L' + v[4] + ' ' + v[5]); };
+    const tick = () => {
+      const u = (performance.now() - tS) / 2000;
+      if (u >= 0.545 || !lgEl.isConnected) { set(0); return; }
+      set(u < 0.30 ? 0 : u < 0.34 ? (u - 0.30) / 0.04 : u < 0.465 ? 1 : 1 - (u - 0.465) / 0.08);
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
   const W = innerWidth, H = innerHeight, DPR = Math.min(devicePixelRatio || 1, 2), PH = Math.min(W, H) < 600;
   cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
   const N = PH ? 560 : 900, rnd = mkRnd(311);

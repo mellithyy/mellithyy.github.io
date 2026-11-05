@@ -2351,7 +2351,7 @@ html:not(.wk-grid) .allw .wgrid .gsoon { display: none; }
 @keyframes lgprwink { 0%, 30% { transform: scaleY(1); } 37%, 58% { transform: scaleY(.12) scaleX(1.15); } 66%, 100% { transform: scaleY(1); } }
 
 .hello .hello-logo .lg-pr { animation: none; overflow: visible; }
-.hello .hello-logo .lg-pr path { animation: lgshut 2s linear .9s 1 both; }
+.hello .hello-logo .lg-pr path { animation: none; }   
 @keyframes lgshut {
   0%, 30% { d: path("M2 2.5 L8 8 L2 13.5"); }
   34%, 46.5% { d: path("M1 7.6 L5 9.8 L9 7.6"); }
