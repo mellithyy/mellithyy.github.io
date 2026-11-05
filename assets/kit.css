@@ -2595,3 +2595,6 @@ html.js .deck .deck-r:not(.on) { display: none; }
   .ft2.dn2 .ft2-caps { margin-top: 92px; }
   .ft2.dn2 .ft2-caps > * { width: 100%; justify-content: center; }
 }
+
+
+@media (max-width: 760px) { .allw .soonrow .soonb { display: table; margin: 10px 0 0; } }

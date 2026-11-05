@@ -605,7 +605,8 @@ function measure() {
   DPR = Math.min(devicePixelRatio || 1, 2);
   NARROW = innerWidth <= 1100;
   const compact = innerWidth < 760;
-  if (!M || compact !== COMPACT) { COMPACT = compact; M = build(COMPACT); timing(); makeDom(); }
+  
+  if (!M || compact !== COMPACT) { COMPACT = compact; M = build(false); timing(); makeDom(); }
   labs.forEach(l => { l._w = l.offsetWidth; l._h = l.offsetHeight; });
   
   
@@ -630,11 +631,11 @@ function measure() {
   setView(AZ0, EL0);
   for (const p of M.parts) { let best = null, by = -Infinity; for (const so of p.prims) for (const v of so.v) { const yv = pjy(...v); if (yv > by + 1e-6) { by = yv; best = v; } } p.downA = best.slice(); p.uDown = [pjx(...best), by]; }
   const m = clamp(innerWidth * 0.032, 20, 64);
-  const LAB = 46;   
+  const LAB = COMPACT ? 66 : 46;   
   if (NARROW) {
     const wAvail = W - 2 * m;
     S = clamp(wAvail / (x1 - x0), 10, 48);
-    H = Math.round((y1 - y0) * S + LAB + (COMPACT ? 14 : 22));
+    H = Math.round((y1 - y0) * S + LAB + (COMPACT ? 54 : 22));
     if (Math.abs(boxEl.clientHeight - H) > 1) boxEl.style.setProperty('--isoph', H + 'px');
     FR = [m, 0, W - m, H]; OBST = [];
     OX = m + (wAvail - (x1 - x0) * S) / 2 - x0 * S;   
@@ -704,7 +705,7 @@ function measure() {
     M.parts.forEach((p, i) => { const X = pjx(...p.anchor), w = labs[i]._w || 70, sd = p.side || 'r', l = sd === 'c' ? X - w / 2 : sd === 'l' ? X - 10 - w : X + 10; over = Math.max(over, l + w - (W - 6), 6 - l); });
     if (over <= 0.5) break;
     const wAvail = W - 2 * m; S = S * Math.max(0.6, (wAvail - 2 * over - 4) / wAvail);
-    H = Math.round((y1 - y0) * S + LAB + (COMPACT ? 14 : 22)); if (Math.abs(boxEl.clientHeight - H) > 1) boxEl.style.setProperty('--isoph', H + 'px');
+    H = Math.round((y1 - y0) * S + LAB + (COMPACT ? 54 : 22)); if (Math.abs(boxEl.clientHeight - H) > 1) boxEl.style.setProperty('--isoph', H + 'px');
     FR = [m, 0, W - m, H]; OX = m + (wAvail - (x1 - x0) * S) / 2 - x0 * S; OY = LAB - y0 * S;
     solveLabels();
   }
@@ -738,16 +739,17 @@ function solveLabels() {
     const ow = (OX + p.uAs[0][0] * S) < cxP ? 'l' : 'r', out = [ow, ow === 'l' ? 'r' : 'l'];
     
     
-    const ne = notes[p.id], nw = ne ? (ne.offsetWidth || 90) : 0;
+    
+    const ne = NARROW ? null : notes[p.id], nw = ne ? (ne.offsetWidth || 90) : 0;
     const cands = [];
     for (let ai = 0; ai < p.uAs.length; ai++) cands.push([p.uAs[ai], ai, -1]);
-    if (p.id === 'match') cands.push([p.uDown, -1, 1]);   
+    if (p.id === 'match' || (NARROW && p.id === 'outbox')) cands.push([p.uDown, -1, 1]);   
     for (const [ua, ai, dir] of cands) for (const lead of [LEADER, LEADER * 1.8, LEADER * 2.5]) for (const side of out) {
       const ax = OX + ua[0] * S, ay = OY + ua[1] * S;
       const top = ay + dir * (6 + lead);
       const box = side === 'c' ? [ax - w / 2 - 5, top - 6 - h - 3, ax + w / 2 + 5, top - 2]
         : side === 'l' ? [ax - 8 - w - 5, top - h / 2 - 4, ax - 2, top + h / 2 + 4] : [ax + 2, top - h / 2 - 4, ax + 8 + w + 5, top + h / 2 + 4];
-      let cost = (lead > LEADER * 2 ? 9 : lead > LEADER ? 4 : 0) + (side === ow ? 0 : 0.9) + Math.max(0, ai) * 0.2 + (dir > 0 ? (p.id === 'match' ? -6 : 40) : 0);   
+      let cost = (lead > LEADER * 2 ? 9 : lead > LEADER ? 4 : 0) + (side === ow ? 0 : 0.9) + Math.max(0, ai) * 0.2 + (dir > 0 ? (p.id === 'match' || (NARROW && p.id === 'outbox') ? -6 : 40) : 0);   
       const mg = clamp(innerWidth * 0.032, 20, 64) - 4;
       if (box[0] < mg || box[2] > W - mg) cost += 60;   
       if (p.id === 'dash' && lead === LEADER) cost += 50;   
@@ -764,10 +766,10 @@ function solveLabels() {
         for (const r of OBST) cost += overlap(nb, [r[0] - 20, r[1] - 10, r[2] + 20, r[3] + 10]) * 0.5;
         if (nb[0] < 20 || nb[2] > W - 20) cost += 30;
       }
-      for (const q of placed) cost += overlap(box, q) * 0.5;
+      for (const q of placed) cost += overlap(box, q) * (NARROW ? 30 : 0.5);   
       for (const [rx, ry] of rails) if (hitRect(air, rx, ry)) cost += 30;   
       for (const r of OBST) cost += overlap(box, [r[0] - 36, r[1] - 16, r[2] + 36, r[3] + 16]) * 0.5;   
-      if (box[1] < 2) cost += 40;
+      if (box[1] < 2) cost += NARROW ? 5000 : 40;   
       if (!NARROW && box[1] < HDRB - 18) cost += 35;   
       if (cost < bestCost) { bestCost = cost; best = { lead, box, ai, side, dir, nb }; }
     }
@@ -1471,7 +1473,7 @@ function frame(t) {
   }
 
   
-  const showAll = !COMPACT;
+  const showAll = true;   
   M.parts.forEach((p, i) => {
     const a = p.anchor, X = pjx(a[0], a[1], a[2]), Y = pjy(a[0], a[1], a[2]);
     const u = STILL ? 1 : clamp((t - p.t0 - 0.35) / 0.45, 0, 1);
@@ -1543,7 +1545,8 @@ function frame(t) {
   
   
   let sk = chOn ? ch.k : -1; while (sk > 0 && !CH.stages[sk].some(id => CT.notes[id])) sk--;   
-  const tipKey = NARROW && chOn ? 'ch' + sk : HINT;
+  
+  const tipKey = NARROW && chOn && chainClock(t) < CH.end + 1.2 ? 'ch' + sk : HINT;
   if (tipFor !== tipKey) {
     tipFor = tipKey;
     if (tipKey === HINT) { tipEl.textContent = HINT; tipEl.classList.remove('on'); }
