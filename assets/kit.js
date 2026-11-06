@@ -1589,6 +1589,15 @@ function layers() {
   const req = () => { if (!pend) { pend = true; requestAnimationFrame(apply); } };
   
   
+  
+  if (foot) {
+    let rt = 0;
+    const repaint = () => { if (sheet.getBoundingClientRect().bottom < innerHeight * 0.5) { foot.classList.toggle('rp'); } };
+    if ('onscrollend' in window) addEventListener('scrollend', repaint, { passive: true });
+    else addEventListener('scroll', () => { clearTimeout(rt); rt = setTimeout(repaint, 160); }, { passive: true });
+  }
+  
+  
   document.addEventListener('focusin', e => {
     
     if (GOING || !sheet.contains(e.target) || !sheet.style.transform || !e.target.matches(':focus-visible')) return;

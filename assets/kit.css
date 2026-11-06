@@ -2617,10 +2617,15 @@ html.js .deck .deck-r:not(.on) { display: none; }
 
 .ctd .ctd-q textarea[rows="4"] { min-height: 7.2em; max-height: 22em; field-sizing: content; overflow-y: auto; }
 
-@media (min-width: 761px) { .ctd .ctd-q textarea[rows="4"] { padding-inline-end: calc(max(12vw, 120px) * 1.2 + 24px); box-sizing: border-box; } }
+.ctd-send { transform: translate(-20%, -35%); }
+:root[dir="rtl"] .ctd-send { transform: translate(20%, -35%); }
+.ctd .ctd-q textarea[rows="4"] { padding-bottom: calc(max(12vw, 120px) * .35 + 14px); box-sizing: border-box; }
 .ctd .ctd-q input:focus-visible, .ctd .ctd-q textarea:focus-visible { outline: none; }
 
 
 html.ft-end .sheet { position: relative; }
 html.ft-end .sheet::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: #121110; z-index: 50; pointer-events: none; }
 html.ft-end .curve span { visibility: hidden; }
+
+
+.foot.rp { outline: 1px solid transparent; outline-offset: -1px; }
