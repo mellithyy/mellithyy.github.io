@@ -2617,9 +2617,10 @@ html.js .deck .deck-r:not(.on) { display: none; }
 
 .ctd .ctd-q textarea[rows="4"] { min-height: 7.2em; max-height: 22em; field-sizing: content; overflow-y: auto; }
 
-.ctd-send { transform: translate(-20%, -35%); }
-:root[dir="rtl"] .ctd-send { transform: translate(20%, -35%); }
-.ctd .ctd-q textarea[rows="4"] { padding-bottom: calc(max(12vw, 120px) * .35 + 14px); box-sizing: border-box; }
+
+.ctd-send { transform: translate(-20%, -50%); }
+:root[dir="rtl"] .ctd-send { transform: translate(20%, -50%); }
+.ctd .ctd-q textarea[rows="4"] { padding-bottom: calc(max(12vw, 120px) * .5 + 18px); box-sizing: border-box; }
 .ctd .ctd-q input:focus-visible, .ctd .ctd-q textarea:focus-visible { outline: none; }
 
 
@@ -2629,3 +2630,8 @@ html.ft-end .curve span { visibility: hidden; }
 
 
 .foot.rp { outline: 1px solid transparent; outline-offset: -1px; }
+
+
+.pv.pvgap { border-radius: 6px; overflow: hidden; }
+.pv .pvcap { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 12px 9px; font-size: 13px; line-height: 1.3; color: #eee9e0;
+  background: linear-gradient(transparent, rgba(18,17,16,.92) 45%); }

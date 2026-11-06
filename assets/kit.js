@@ -1704,14 +1704,31 @@ function workList(rowsEl) {
   const ONPTR = true;   
   const PVS = () => innerWidth < 1101 ? 300 : 360;   
   let size = PVS();
+  
+  
+  const GAP = Q.get('pv') === 'gap' && document.body.classList.contains('allw') && innerWidth > 1100;
+  const GW = () => Math.round(clamp(innerWidth * 0.17, 240, 340)), GH = () => Math.round(GW() * 9 / 16);
+  const dims = () => GAP ? [GW(), GH()] : [size, size];
+  let gcap = null;
+  if (GAP) { pv.classList.add('pvgap'); gcap = document.createElement('div'); gcap.className = 'pvcap'; pv.appendChild(gcap); if (pvv) pvv.style.display = 'none'; }
   const scenes = {};
-  const sceneOf = id => { if (!SPECS[id]) return null; if (!scenes[id]) { scenes[id] = new Scene(pvCv, SPECS[id], { size: [size, size], bg: '#161513' }); scenes[id].resize(); } return scenes[id]; };
+  const sceneOf = id => { if (!SPECS[id]) return null; if (!scenes[id]) { scenes[id] = new Scene(pvCv, SPECS[id], { size: dims(), bg: '#161513' }); scenes[id].resize(); } return scenes[id]; };
   const st = { x: 0, y: 0, vx: 0, vy: 0, tx: 0, ty: 0, s: 0, vs: 0, ts: 0, on: false, placed: false, cur: null, start: 0 };
   let ptr = null, raf = 0, last = now();
-  pv.style.width = pv.style.height = size + 'px';
+  pv.style.width = dims()[0] + 'px'; pv.style.height = dims()[1] + 'px';
   
   
   function target(cx, cy, row) {
+    if (GAP && row) {
+      const [w, h] = dims(), r = row.getBoundingClientRect(), org = row.querySelector('.rf').getBoundingClientRect();
+      const rg = document.createRange(); rg.selectNodeContents(row.querySelector('.rtt')); const tt = rg.getBoundingClientRect();
+      let x = AR ? org.right + 28 : org.left - 28 - w;
+      if (!AR && x < tt.right + 20) x = tt.right + 20; if (AR && x + w > tt.left - 20) x = tt.left - 20 - w;
+      st.tx = x; st.ty = clamp(r.top + r.height / 2 - h / 2, 12, innerHeight - h - 12);
+      if (!st.placed) { st.x = st.tx; st.y = st.ty; st.placed = true; }
+      if (gcap) gcap.textContent = row.dataset.k || '';
+      return;
+    }
     const half = size / 2;
     let x = cx - half, y;
     if (ONPTR) y = cy - half;
@@ -1807,7 +1824,7 @@ function workList(rowsEl) {
     }
     if (busy || st.ts > 0) raf = requestAnimationFrame(tick);
   }
-  addEventListener('resize', () => { const n = PVS(); if (n !== size) { size = n; pv.style.width = pv.style.height = n + 'px'; for (const id in scenes) delete scenes[id]; } });
+  addEventListener('resize', () => { const n = PVS(); if (n !== size || GAP) { size = n; pv.style.width = dims()[0] + 'px'; pv.style.height = dims()[1] + 'px'; for (const id in scenes) delete scenes[id]; } });
   if (document.fonts) document.fonts.ready.then(() => { for (const id in scenes) scenes[id].resize(); });
   const api = { rows, hoverRow, show: id => { const r = rows.find(x => x.dataset.id === id); const b = r.getBoundingClientRect(); st.placed = false; target(AR ? b.right - b.width * 0.45 : b.left + b.width * 0.45, b.top + b.height / 2, r); hoverRow(r); } };
   window.__list = api;
