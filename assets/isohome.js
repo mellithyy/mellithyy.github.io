@@ -1783,13 +1783,23 @@ addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { car
 if (!RM && !Q.has('flat')) {
   const head = document.querySelector('.head');
   let pend = false;
-  const apply = () => { pend = false; if (innerWidth <= 1100) { boxEl.style.transform = ''; boxEl.style.opacity = ''; return; } const y = scrollY, Hh = head ? head.offsetHeight : innerHeight, k = innerWidth < 700 ? 0.5 : 1, u = clamp(y / Math.max(1, Hh), 0, 1);
-    boxEl.style.transform = u > 0 ? `translate3d(0, ${(Math.min(y, Hh) * 0.6 * k).toFixed(1)}px, 0)` : ''; boxEl.style.opacity = u > 0 ? (1 - u * 0.6).toFixed(3) : ''; };
+  var HERO_TXT = ['#name', '.hero .htitle', '#isocap'].map(q => document.querySelector(q)).filter(Boolean);
+  const apply = () => { pend = false; if (innerWidth <= 1100) { boxEl.style.transform = ''; boxEl.style.opacity = ''; for (const el of HERO_TXT) el.style.translate = ''; return; } const y = scrollY, Hh = head ? head.offsetHeight : innerHeight, k = innerWidth < 700 ? 0.5 : 1, u = clamp(y / Math.max(1, Hh), 0, 1);
+    boxEl.style.transform = u > 0 ? `translate3d(0, ${(Math.min(y, Hh) * 0.6 * k).toFixed(1)}px, 0)` : ''; boxEl.style.opacity = u > 0 ? (1 - u * 0.6).toFixed(3) : '';
+    
+    
+    
+    const ty = u > 0 ? `0 ${(Math.min(y, Hh) * 0.6 * k).toFixed(1)}px` : '';
+    for (const el of HERO_TXT) el.style.translate = ty; };
   addEventListener('scroll', () => { if (!pend) { pend = true; requestAnimationFrame(apply); } }, { passive: true });
 }
 
 
-{ const m0 = measure; measure = function () { const tf = boxEl.style.transform; boxEl.style.transform = ''; try { return m0.apply(this, arguments); } finally { boxEl.style.transform = tf; } }; }
+{ const m0 = measure; measure = function () {
+  
+  const txt = ['#name', '.hero .htitle', '#isocap'].map(q => document.querySelector(q)).filter(Boolean), tr = txt.map(e => e.style.translate);
+  const tf = boxEl.style.transform; boxEl.style.transform = ''; txt.forEach(e => { e.style.translate = ''; });
+  try { return m0.apply(this, arguments); } finally { boxEl.style.transform = tf; txt.forEach((e, i) => { e.style.translate = tr[i]; }); } }; }
 })();
 
 
