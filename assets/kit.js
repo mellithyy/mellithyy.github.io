@@ -1579,7 +1579,11 @@ function layers() {
       const maxH = Math.max(0, Math.min(vh * (k < 1 ? 0.07 : 0.12), padTop - 16));
       
       
-      curve.style.height = `${((1 - p) * maxH).toFixed(1)}px`;   
+      curve.style.height = `${((1 - p) * maxH).toFixed(1)}px`;
+      
+      
+      
+      html.classList.toggle('ft-end', sheet.getBoundingClientRect().bottom < 6);   
     }
   }
   const req = () => { if (!pend) { pend = true; requestAnimationFrame(apply); } };
