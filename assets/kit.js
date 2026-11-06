@@ -2114,6 +2114,12 @@ function returnBar() {
 
 
 function contact() {
+  
+  
+  if (!(window.CSS && CSS.supports && CSS.supports('field-sizing', 'content'))) document.querySelectorAll('.ctd textarea').forEach(t => {
+    const fit = () => { t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight + 2, parseFloat(getComputedStyle(t).maxHeight) || 9e9) + 'px'; };
+    t.addEventListener('input', fit); fit();
+  });
   const num = [66, 45, 45, 38, 45, 31, 17, 10, 52, 10, 52, 66].map(x => (x - 3) / 7).join('');
   document.querySelectorAll('[data-wa]').forEach(a => { a.href = 'https://wa.me/' + num; a.target = '_blank'; a.rel = 'noopener'; });
   document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => {

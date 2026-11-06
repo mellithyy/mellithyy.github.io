@@ -2609,3 +2609,13 @@ html.js .deck .deck-r:not(.on) { display: none; }
   .ft2.dn2 .ft2-mailcap:has(.ft2-copy:hover)::before { transform: translate3d(0, 76%, 0); }
 }
 .ft-copy.done, .ft-copy.done:hover, .ft2.dn2 .ft2-mailcap .ft2-copy.done, .ft2.dn2 .ft2-mailcap .ft2-copy.done:hover { background: #d9a441 !important; border-color: #d9a441 !important; color: #121110 !important; }
+
+
+.home .hm-intro2.solo.dn { padding: clamp(72px, 6.6vw, 140px) 0 clamp(16px, 1.6vw, 32px); }
+@media (max-width: 900px) { .home .hm-intro2.solo.dn { padding: 56px 0 24px; } }
+
+
+.ctd .ctd-q textarea[rows="4"] { min-height: 7.2em; max-height: 22em; field-sizing: content; overflow-y: auto; }
+
+@media (min-width: 761px) { .ctd .ctd-q textarea[rows="4"] { padding-inline-end: calc(max(12vw, 120px) * 1.2 + 24px); box-sizing: border-box; } }
+.ctd .ctd-q input:focus-visible, .ctd .ctd-q textarea:focus-visible { outline: none; }
